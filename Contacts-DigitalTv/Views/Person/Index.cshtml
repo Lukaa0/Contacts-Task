@@ -1,0 +1,135 @@
+﻿@model IEnumerable<Contacts_DigitalTv.ViewModels.ContactViewModel>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h1>კონტაქტები</h1>
+
+<p>
+    <a asp-action="Create">კონტაქტის დამატება</a>
+</p>
+<input type="text" id="name_input" onkeyup="myFunction('name_input', 1)" placeholder="სახელი...">
+<input type="hidden" id="surename_input" class="av-show"  onkeyup="myFunction('surename_input',2)" placeholder="გვარი...">
+<input type="hidden"id="birthdate_input" class="av-show" onkeyup="myFunction('birthdate_input',4)" placeholder="დაბადების თარიღი...">
+<input type="hidden" id="number_input" class="av-show" onkeyup="myFunction('number_input',5)" placeholder="ქალაქი...">
+<input type="hidden" id="city_input" class="av-show" onkeyup="myFunction('city_input',7)" placeholder="ტელეფონის ნომერი...">
+
+<a href="javascript:void(0);" id="advanced_search" onclick="showAdvanced()">დეტალური ძებნა</a>
+<a style="float:right;" asp-action="Favorites" class="btn btn-info">ფავორიტებში გადასვლა</a>
+<table id="main-table" class="table">
+    <thead>
+        <tr>
+            <th>
+                სურათი
+            </th>
+            <th>
+                სახელი
+            </th>
+            <th>
+                გვარი
+            </th>
+            <th>
+                სქესი
+            </th>
+            <th>
+                დაბადების თარიღი
+            </th>
+            <th>
+                ქალაქი
+            </th>
+            <th>
+                მისამართი
+            </th>
+            <th>
+                ტელეფონის ნომერი
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="target-tr">
+
+                <td>
+                    @if (item.Image != null)
+                    {
+
+                        var base64 = Convert.ToBase64String(item.Image);
+                        var imgSrc = String.Format("data:image/png;base64,{0}", base64);
+                        <img style="height:50px; width:50px;" src="@imgSrc" />
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surename)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gender)
+                </td>
+                <td>
+                     
+                    @Html.DisplayFor(modelItem => item.Birthdate.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.City)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.AddressLine)
+                </td>
+
+                <td>
+                    @for (int i = 0; i < item.Phones.Count(); i++)
+                    {
+                        @Html.DisplayFor(modelItem => item.Phones[i].Number);
+                        <br />
+                    }
+
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">შეცვლა</a> |
+                    <a asp-action="AddToFavorite" asp-route-id="@item.Id">@(item.IsFavorite ? "ფავორიტებიდან წაშლა": "ფავორიტებში დამატება")</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">წაშლა</a>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<script>
+    function showAdvanced() {
+
+        $('.av-show').attr('type', 'text');
+        $('#advanced_search').text("დამალვა");
+        $('#advanced_search').attr('onclick', 'hideAdvanced()');
+    }
+    function hideAdvanced() {
+        $('.av-show').attr('type', 'hidden');
+        $('#advanced_search').text("დეტალური ძებნა");
+        $('#advanced_search').attr('onclick', 'showAdvanced()');
+
+    }
+    function myFunction(id,index) {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById(id);
+        filter = input.value.toUpperCase();
+        table = document.getElementById("main-table");
+        tr = table.getElementsByClassName("target-tr");
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[index];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>
